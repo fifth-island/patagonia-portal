@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Patagonia Expedition '27</title>
+<meta name="description" content="Four friends, eleven days: Buenos Aires, El Calafate, El Chaltén, Torres del Paine and the penguins of Isla Magdalena. 7–17 January 2027.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M4 56 L22 14 L30 30 L38 6 L60 56Z' fill='%232E8FB8'/%3E%3Cpath d='M38 6 L33 20 L38 17 L43 22Z' fill='white'/%3E%3C/svg%3E">
+<style>
+/* Layout: field-journal expedition log — a dawn-lit illustrated range as the hero, then a sticky trail-sign nav over stacked sections (route map, calendar, places, budget, packing, bookings). */
+:root{
+  --bg:#EEF3F3;          /* glacier mist */
+  --surface:#FFFFFF;
+  --surface-2:#E3ECEE;
+  --ink:#13212A;         /* granite slate */
+  --muted:#556871;
+  --line:#CFDCDF;
+  --glacier:#1F7FA8;     /* accent: glacier-melt blue */
+  --glacier-soft:#BFE0EE;
+  --steppe:#B98A2E;      /* coirón grass gold — Buenos Aires */
+  --steppe-soft:#F1E3C2;
+  --lenga:#B9472A;       /* lenga beech red — Chile */
+  --lenga-soft:#F3D6CB;
+  --sky-1:#A9CFDF; --sky-2:#E6EFEF;
+  --m-far:#9DB9C4; --m-mid:#5F7F8D; --m-near:#2C4450; --snow:#F7FBFC;
+  --hero-ink:#0F1E26;
+  --shadow:0 1px 2px rgba(19,33,42,.06),0 8px 24px rgba(19,33,42,.06);
+  --f-display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",Impact,sans-serif;
+  --f-body:"Hanken Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --radius:10px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B141A; --surface:#121E25; --surface-2:#18272F; --ink:#E4EDEF; --muted:#94A7AF; --line:#24363F;
+    --glacier:#5DB9E0; --glacier-soft:#163B4B; --steppe:#D9B25E; --steppe-soft:#3A2F17; --lenga:#E57D5C; --lenga-soft:#43231A;
+    --sky-1:#07111A; --sky-2:#122530; --m-far:#2F4C5C; --m-mid:#213847; --m-near:#0C171D; --snow:#AFC6D0; --hero-ink:#E8F1F3;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B141A; --surface:#121E25; --surface-2:#18272F; --ink:#E4EDEF; --muted:#94A7AF; --line:#24363F;
+  --glacier:#5DB9E0; --glacier-soft:#163B4B; --steppe:#D9B25E; --steppe-soft:#3A2F17; --lenga:#E57D5C; --lenga-soft:#43231A;
+  --sky-1:#07111A; --sky-2:#122530; --m-far:#2F4C5C; --m-mid:#213847; --m-near:#0C171D; --snow:#AFC6D0; --hero-ink:#E8F1F3;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:var(--glacier)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--glacier);outline-offset:2px;border-radius:4px}
+[hidden]{display:none!important}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--f-mono);font-size:.8rem;letter-spacing:.02em}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:.95}
+h2{font-size:clamp(2.4rem,5vw,3.6rem);font-weight:800;text-transform:uppercase;letter-spacing:.01em}
+h3{font-size:1.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+.eyebrow{font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+p{margin:0}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--sky-1),var(--sky-2) 70%);color:var(--hero-ink)}
+.hero-inner{position:relative;z-index:2;padding-block:56px 260px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:start}
+.hero h1{font-size:clamp(4.2rem,13vw,10.5rem);font-weight:900;text-transform:uppercase;letter-spacing:-.01em;line-height:.82}
+.hero h1 .yr{color:var(--glacier)}
+.hero .lede{max-width:54ch;font-size:1.12rem;margin-top:18px}
+.hero .eyebrow{color:inherit;opacity:.75}
+.stats{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:26px}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--f-display);font-size:2.2rem;font-weight:800;line-height:1}
+.stat span{font-family:var(--f-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;opacity:.75}
+.countdown{display:inline-flex;align-items:baseline;gap:10px;margin-top:22px;padding:8px 14px;border:1.5px solid currentColor;border-radius:999px;font-family:var(--f-mono);font-size:.82rem}
+.countdown b{font-family:var(--f-display);font-size:1.6rem;line-height:1}
+.compass{width:168px;height:168px;flex:none}
+.compass .needle{transform-origin:100px 100px;animation:swing 3.2s cubic-bezier(.3,1.6,.5,1) both, drift 7s ease-in-out 3.2s infinite}
+@keyframes swing{0%{transform:rotate(40deg)}100%{transform:rotate(180deg)}}
+@keyframes drift{0%,100%{transform:rotate(180deg)}50%{transform:rotate(174deg)}}
+.compass .ring{animation:spin 120s linear infinite;transform-origin:100px 100px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.range{position:absolute;inset:auto 0 0 0;height:340px;z-index:1;width:100%}
+.range svg{width:100%;height:100%;display:block}
+.penguin{position:absolute;z-index:3;bottom:22px;right:max(24px,8vw);width:58px;transform-origin:50% 100%;animation:waddle 1.6s ease-in-out infinite}
+.penguin.two{right:calc(max(24px,8vw) + 54px);width:44px;animation-delay:.4s;bottom:20px}
+@keyframes waddle{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.stars{position:absolute;inset:0;z-index:0;opacity:0;pointer-events:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .stars{opacity:1}}
+:root[data-theme="dark"] .stars{opacity:1}
+
+/* ---------- NAV ---------- */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:1000;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;padding-block:10px}
+.nav .wrap::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;color:var(--ink);font-family:var(--f-mono);font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;padding:7px 12px;border-radius:999px}
+.nav a:hover{background:var(--surface-2)}
+.nav .brand{font-family:var(--f-display);font-weight:900;font-size:1.25rem;letter-spacing:.02em;margin-right:auto;padding-left:0}
+.theme-btn{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:34px;height:34px;cursor:pointer;display:grid;place-items:center}
+
+/* ---------- SECTIONS ---------- */
+section{padding-block:72px 24px}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px;margin-bottom:24px}
+.sec-head p{max-width:60ch;color:var(--muted)}
+.sec-head .lhs{display:flex;flex-direction:column;gap:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.ba{background:var(--steppe-soft);border-color:transparent;color:var(--ink)}
+.chip.ar{background:var(--glacier-soft);border-color:transparent;color:var(--ink)}
+.chip.cl{background:var(--lenga-soft);border-color:transparent;color:var(--ink)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dot.ba{background:var(--steppe)}.dot.ar{background:var(--glacier)}.dot.cl{background:var(--lenga)}
+
+/* segmented control */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:999px;cursor:pointer;font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* ---------- MAP ---------- */
+.map-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px}
+#map{height:560px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface-2);z-index:0}
+.stoplist{display:flex;flex-direction:column;max-height:560px;overflow:auto;padding:6px}
+.stop{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;padding:10px;border-radius:8px;cursor:pointer;border:0;background:transparent;text-align:left;width:100%}
+.stop:hover,.stop.on{background:var(--surface-2)}
+.stop .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:.75rem;font-weight:500;color:#fff}
+.stop .n.ba{background:var(--steppe)}.stop .n.ar{background:var(--glacier)}.stop .n.cl{background:var(--lenga)}
+.stop b{display:block;font-weight:600;line-height:1.25}
+.stop small{color:var(--muted);font-size:.82rem;line-height:1.35;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;color:var(--muted);font-size:.85rem}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend svg{flex:none}
+.map-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pin{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font:500 12px/1 var(--f-mono);border:2.5px solid var(--surface);box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.pin.ba{background:var(--steppe)}.pin.ar{background:var(--glacier)}.pin.cl{background:var(--lenga)}
+.pin.hi{transform:scale(1.25);box-shadow:0 0 0 4px color-mix(in srgb,var(--glacier) 40%,transparent),0 2px 6px rgba(0,0,0,.35)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--surface);color:var(--ink)}
+.leaflet-popup-content{margin:12px;font-family:var(--f-body);width:220px!important}
+.leaflet-popup-content img{border-radius:6px;margin-bottom:8px;aspect-ratio:16/10;object-fit:cover;width:100%;background:var(--surface-2)}
+.leaflet-popup-content b{font-family:var(--f-display);font-size:1.25rem;text-transform:uppercase;display:block;line-height:1}
+.leaflet-container{font-family:var(--f-body)}
+.leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+.leaflet-control-attribution{font-size:10px}
+.route-label{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:2px 8px;font:500 10px/1.4 var(--f-mono);white-space:nowrap;box-shadow:var(--shadow)}
+
+/* ---------- CALENDAR ---------- */
+.cal-grid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;align-items:start}
+.month{padding:18px}
+.month-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.month-head h3{font-size:1.9rem}
+.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow span{font-family:var(--f-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:center;padding-bottom:4px}
+.day{aspect-ratio:1/1.1;max-width:100%;border-radius:7px;border:1px solid transparent;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:5px 6px;font-family:var(--f-mono);font-size:.78rem;color:var(--muted);background:transparent;min-width:0}
+.day.trip{cursor:pointer;color:var(--ink);font-weight:500}
+.day.trip.ba{background:var(--steppe-soft)}.day.trip.ar{background:var(--glacier-soft)}.day.trip.cl{background:var(--lenga-soft)}
+.day.trip .tag{display:flex;opacity:.8}
+.day.trip.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.day.trip:hover{border-color:var(--muted)}
+.month .legend{margin-top:14px;font-size:.8rem}
+.detail{overflow:hidden;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.detail .ph{position:relative;min-height:340px;background:linear-gradient(160deg,var(--glacier-soft),var(--surface-2))}
+.detail .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.detail .ph .cap{position:absolute;left:12px;bottom:12px;right:12px;display:flex;gap:6px;flex-wrap:wrap}
+.detail .ph .cap .chip{background:color-mix(in srgb,var(--surface) 88%,transparent);color:var(--ink);border-color:transparent}
+.detail .body{padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.detail .when{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.detail h3{font-size:2.2rem;line-height:.95}
+.detail ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.facts div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.facts dt{font-family:var(--f-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.facts dd{margin:0;font-size:.92rem;line-height:1.35}
+.daynav{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer;font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* at-a-glance timeline */
+.timeline{margin-top:16px;overflow-x:auto}
+.timeline table{width:100%;border-collapse:collapse;min-width:720px;font-size:.9rem}
+.timeline th,.timeline td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.timeline th{font-family:var(--f-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:500}
+.timeline tr{cursor:pointer}
+.timeline tbody tr:hover{background:var(--surface-2)}
+.timeline tr.on td{background:var(--surface-2)}
+.timeline td:first-child{font-family:var(--f-mono);white-space:nowrap}
+
+/* elevation */
+.hike{margin-top:16px;padding:20px;display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:24px;align-items:center}
+.hike .facts{border:0;padding:0}
+.elev{position:relative;min-width:0}
+.elev svg{width:100%;height:auto;display:block;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:500 .74rem/1.3 var(--f-mono);padding:6px 8px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-120%);opacity:0;transition:opacity .12s}
+.tip.show{opacity:1}
+
+/* ---------- PLACES ---------- */
+.places{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}
+.place{position:relative;overflow:hidden;border-radius:var(--radius);background:linear-gradient(160deg,var(--glacier-soft),var(--surface-2));min-height:240px;grid-column:span 4;isolation:isolate}
+.place.w6{grid-column:span 6}.place.w8{grid-column:span 8}.place.tall{min-height:340px}
+.place img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s ease;z-index:-1}
+.place:hover img{transform:scale(1.04)}
+.place .ov{position:absolute;inset:auto 0 0 0;padding:44px 16px 14px;background:linear-gradient(0deg,rgba(8,16,22,.82),rgba(8,16,22,0));color:#F4F8F9;display:flex;flex-direction:column;gap:4px}
+.place .ov b{font-family:var(--f-display);font-size:1.7rem;font-weight:800;text-transform:uppercase;line-height:.95}
+.place .ov span{font-size:.88rem;opacity:.92;max-width:44ch}
+.place .ov .mono{opacity:.75;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em}
+
+/* ---------- BUDGET ---------- */
+.budget{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;align-items:start}
+.total{padding:22px;display:flex;flex-direction:column;gap:12px}
+.total .big{font-family:var(--f-display);font-weight:900;font-size:clamp(2.8rem,6vw,3.8rem);line-height:.9}
+.total .big small{font-size:.45em;font-weight:600;color:var(--muted);display:block;letter-spacing:.02em;margin-top:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.opt input{margin-top:4px;accent-color:var(--glacier);width:16px;height:16px}
+.opt span{display:flex;flex-direction:column}
+.opt small{color:var(--muted)}
+.bars{padding:22px;position:relative}
+.bar-row{display:grid;grid-template-columns:170px minmax(0,1fr) 120px;gap:14px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.bar-row:last-of-type{border-bottom:0}
+.bar-row .lbl b{display:block;font-weight:600;font-size:.95rem;line-height:1.2}
+.bar-row .lbl small{display:block;color:var(--muted);font-size:.76rem;line-height:1.3}
+.bar-row .val{text-align:right;font-family:var(--f-mono);font-size:.8rem}
+.track{position:relative;height:22px}
+.track .g{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.track .lo{position:absolute;left:0;top:3px;height:16px;background:var(--glacier);border-radius:0 4px 4px 0}
+.track .hi{position:absolute;top:3px;height:16px;background:color-mix(in srgb,var(--glacier) 32%,transparent);border-radius:0 4px 4px 0}
+.track .opt-bar .lo{background:var(--steppe)}
+.track .opt-bar .hi{background:color-mix(in srgb,var(--steppe) 32%,transparent)}
+.axis{display:grid;grid-template-columns:170px minmax(0,1fr) 120px;gap:14px;margin-top:6px}
+.axis .ticks{position:relative;height:16px;font-family:var(--f-mono);font-size:.66rem;color:var(--muted)}
+.axis .ticks span{position:absolute;transform:translateX(-50%)}
+.keyline{display:flex;flex-wrap:wrap;gap:16px;color:var(--muted);font-size:.8rem;margin-bottom:10px}
+.keyline i{display:inline-block;width:18px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:6px}
+.note{color:var(--muted);font-size:.84rem;margin-top:12px}
+
+/* ---------- PACKING ---------- */
+.pack-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.meter{flex:1;min-width:200px;height:10px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--glacier);border-radius:999px;transition:width .3s}
+.pack{columns:3 300px;column-gap:16px}
+.pack .card{break-inside:avoid;margin-bottom:16px;padding:18px}
+.pack h3{font-size:1.3rem;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pack h3 svg{flex:none}
+.item{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer;line-height:1.35}
+.item input{margin-top:3px;accent-color:var(--glacier);width:16px;height:16px;flex:none}
+.item small{display:block;color:var(--muted);font-size:.8rem}
+.item input:checked + span{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+
+/* ---------- KNOW / BOOK ---------- */
+.know{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.know .card{padding:18px;display:flex;flex-direction:column;gap:8px}
+.know .card h3{font-size:1.25rem}
+.know .card p{color:var(--muted);font-size:.92rem}
+.know .card.alert{border-color:var(--lenga);background:color-mix(in srgb,var(--lenga-soft) 55%,var(--surface))}
+.know .card.alert p{color:var(--ink)}
+.book{display:flex;flex-direction:column}
+.brow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.brow:last-child{border-bottom:0}
+.brow .pri{font-family:var(--f-display);font-weight:900;font-size:2rem;line-height:1;color:var(--muted)}
+.brow b{font-weight:600}
+.brow small{display:block;color:var(--muted);font-size:.84rem}
+.brow .acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.status{border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;background:var(--surface);font-family:var(--f-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;min-width:96px}
+.status[data-s="1"]{background:var(--steppe-soft);border-color:transparent}
+.status[data-s="2"]{background:var(--glacier);color:#fff;border-color:transparent}
+.brow.done b{text-decoration:line-through;text-decoration-color:var(--muted)}
+
+footer{margin-top:72px;border-top:1px solid var(--line);padding-block:28px 48px;color:var(--muted);font-size:.8rem}
+footer .credits{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px}
+footer a{color:var(--muted)}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 980px){
+  .map-grid,.cal-grid,.budget{grid-template-columns:minmax(0,1fr)}
+  .stoplist{max-height:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  #map{height:440px}
+  .know{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .place,.place.w6,.place.w8{grid-column:span 6}
+  .month{max-width:440px}
+}
+@media (max-width: 720px){
+  .hero-inner{grid-template-columns:minmax(0,1fr);padding-block:40px 220px}
+  .compass{width:110px;height:110px;position:absolute;right:16px;top:28px;opacity:.9}
+  .range{height:240px}
+  .detail{grid-template-columns:minmax(0,1fr)}
+  .detail .ph{min-height:220px}
+  .hike{grid-template-columns:minmax(0,1fr)}
+  .know{grid-template-columns:minmax(0,1fr)}
+  .place,.place.w6,.place.w8{grid-column:span 12}
+  .bar-row,.axis{grid-template-columns:minmax(0,1fr) 92px}
+  .bar-row .lbl{grid-column:1/-1}
+  .axis>div:first-child{display:none}
+  .brow{grid-template-columns:32px minmax(0,1fr)}
+  .brow .acts{grid-column:2;justify-content:flex-start}
+  .nav .brand{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= HERO ======================= -->
+<header class="hero" id="top">
+  <canvas class="stars" id="stars" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+    <div>
+      <p class="eyebrow">Expedition log · 7 – 17 January 2027 · 4 friends from Brazil</p>
+      <h1>Patagonia<br><span class="yr">'27</span></h1>
+      <p class="lede">Buenos Aires nights, then south to the end of the map: Perito Moreno's ice wall, the granite spires of Fitz Roy, the towers of Paine, and a boat to the penguins of Isla Magdalena.</p>
+      <div class="stats">
+        <div class="stat"><b class="num">11</b><span>days</span></div>
+        <div class="stat"><b class="num">2</b><span>countries</span></div>
+        <div class="stat"><b class="num">≈1,500</b><span>km overland</span></div>
+        <div class="stat"><b class="num">53°S</b><span>southernmost</span></div>
+        <div class="stat"><b class="num">≈17h</b><span>of daylight</span></div>
+      </div>
+      <div class="countdown" id="countdown" aria-live="polite"><b class="num" id="cd-days">—</b><span id="cd-label">days until wheels-up · Thu 7 Jan</span></div>
+    </div>
+    <svg class="compass" viewBox="0 0 200 200" role="img" aria-label="Compass pointing south">
+      <g class="ring">
+        <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="currentColor" stroke-opacity=".2" stroke-width="1" stroke-dasharray="2 5"/>
+        <g id="ticks" stroke="currentColor" stroke-opacity=".5"></g>
+      </g>
+      <g font-family="JetBrains Mono, monospace" font-size="13" font-weight="500" fill="currentColor" text-anchor="middle">
+        <text x="100" y="47" opacity=".6">N</text>
+        <text x="157" y="105" opacity=".6">E</text>
+        <text x="43" y="105" opacity=".6">W</text>
+        <text x="100" y="166" fill="var(--glacier)" font-size="16" font-weight="700">S</text>
+      </g>
+      <g class="needle">
+        <polygon points="100,40 108,100 100,96 92,100" fill="var(--lenga)"/>
+        <polygon points="100,160 108,100 100,104 92,100" fill="currentColor" opacity=".55"/>
+      </g>
+      <circle cx="100" cy="100" r="5" fill="currentColor"/>
+    </svg>
+  </div>
+
+  <div class="range" aria-hidden="true">
+    <svg viewBox="0 0 1440 340" preserveAspectRatio="xMidYMax slice">
+      <!-- far range -->
+      <polygon fill="var(--m-far)" points="0,250 70,205 130,222 210,170 270,196 340,150 410,188 470,160 540,196 620,140 700,182 770,158 850,192 930,148 1010,186 1090,160 1170,198 1250,150 1330,184 1440,160 1440,340 0,340"/>
+      <!-- mid range: Fitz Roy–like spires -->
+      <polygon fill="var(--m-mid)" points="0,290 90,250 160,262 250,214 300,232 360,196 400,210 452,120 470,150 492,92 510,138 530,60 548,128 566,104 586,150 620,170 680,150 720,176 800,206 880,180 940,196 990,150 1012,112 1030,140 1046,96 1064,132 1080,118 1110,168 1190,200 1270,184 1360,214 1440,196 1440,340 0,340"/>
+      <!-- snow caps on spires -->
+      <polygon fill="var(--snow)" points="452,120 461,136 470,150 476,132 492,92 500,114 510,138 520,96 530,60 538,96 548,128 556,112 566,104 560,118 548,138 536,112 530,104 520,130 510,150 500,128 492,118 482,140 470,160 460,140"/>
+      <polygon fill="var(--snow)" points="1012,112 1021,128 1030,140 1038,118 1046,96 1056,116 1064,132 1072,124 1080,118 1074,132 1064,144 1054,128 1046,120 1036,136 1030,150 1020,134"/>
+      <!-- glacier lake band -->
+      <rect x="0" y="282" width="1440" height="16" fill="var(--glacier)" opacity=".55"/>
+      <!-- near hills -->
+      <path fill="var(--m-near)" d="M0,300 C120,282 220,296 330,290 C460,282 560,304 700,296 C840,288 960,304 1100,294 C1230,286 1330,300 1440,292 L1440,340 L0,340 Z"/>
+      <!-- lenga trees -->
+      <g fill="var(--m-near)">
+        <polygon points="150,292 160,262 170,292"/><polygon points="168,294 176,270 184,294"/>
+        <polygon points="1210,292 1220,258 1230,292"/><polygon points="1228,294 1237,268 1246,294"/>
+        <polygon points="1250,294 1258,274 1266,294"/>
+      </g>
+    </svg>
+  </div>
+  <svg class="penguin two" viewBox="0 0 60 80" aria-hidden="true"><use href="#penguin"/></svg>
+  <svg class="penguin" viewBox="0 0 60 80" role="img" aria-label="Magellanic penguin"><use href="#penguin"/></svg>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="penguin">
+      <ellipse cx="30" cy="46" rx="20" ry="28" fill="#1A2329"/>
+      <ellipse cx="30" cy="52" rx="13" ry="20" fill="#F6F8F8"/>
+      <path d="M17 34 Q30 22 43 34 Q30 30 17 34Z" fill="#F6F8F8"/>
+      <circle cx="30" cy="22" r="12" fill="#1A2329"/>
+      <path d="M20 24 Q24 14 30 18 Q36 14 40 24" fill="none" stroke="#F6F8F8" stroke-width="2.2"/>
+      <circle cx="25.5" cy="22" r="1.6" fill="#F6F8F8"/><circle cx="34.5" cy="22" r="1.6" fill="#F6F8F8"/>
+      <path d="M26 27 L30 33 L34 27Z" fill="#D9A23A"/>
+      <path d="M12 42 Q6 56 12 64 Q14 52 17 46Z" fill="#1A2329"/>
+      <path d="M48 42 Q54 56 48 64 Q46 52 43 46Z" fill="#1A2329"/>
+      <path d="M18 74 L25 72 L25 76 L16 77Z M42 74 L35 72 L35 76 L44 77Z" fill="#D9A23A"/>
+      <path d="M21 40 Q30 46 39 40" fill="none" stroke="#1A2329" stroke-width="2"/>
+    </g>
+  </defs>
+</svg>
+
+<!-- ======================= NAV ======================= -->
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a class="brand" href="#top">PATAGONIA '27</a>
+    <a href="#route">Route</a>
+    <a href="#calendar">Calendar</a>
+    <a href="#places">Places</a>
+    <a href="#budget">Budget</a>
+    <a href="#packing">Packing</a>
+    <a href="#know">Good to know</a>
+    <a href="#bookings">Bookings</a>
+    <button class="theme-btn" id="themeBtn" aria-label="Switch light or dark theme" title="Theme">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main>
+<!-- ======================= ROUTE ======================= -->
+<section id="route">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="lhs">
+        <span class="eyebrow">01 · The route</span>
+        <h2>From the tango capital to the Strait of Magellan</h2>
+      </div>
+      <div class="map-tools">
+        <div class="seg" role="group" aria-label="Map view">
+          <button type="button" data-view="all" aria-pressed="false">Whole trip</button>
+          <button type="button" data-view="pat" aria-pressed="true">Patagonia</button>
+        </div>
+      </div>
+    </div>
+    <div class="map-grid">
+      <div>
+        <div id="map" role="region" aria-label="Trip map"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="card stoplist" id="stoplist" aria-label="Stops"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CALENDAR ======================= -->
+<section id="calendar">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="lhs">
+        <span class="eyebrow">02 · Day by day</span>
+        <h2>Eleven days, Thursday to Sunday</h2>
+      </div>
+      <p>Pick a day to see the plan, where we sleep and how we move. The map follows along.</p>
+    </div>
+    <div class="cal-grid">
+      <div class="card month">
+        <div class="month-head"><h3>January</h3><span class="mono">2027</span></div>
+        <div class="dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+        <div class="days" id="days"></div>
+        <div class="legend">
+          <span><i class="dot ba"></i>Buenos Aires</span>
+          <span><i class="dot ar"></i>Argentine Patagonia</span>
+          <span><i class="dot cl"></i>Chilean Patagonia</span>
+        </div>
+      </div>
+      <article class="card detail" id="detail" aria-live="polite"></article>
+    </div>
+
+    <div class="card hike">
+      <div>
+        <span class="eyebrow">The big one · Tue 12 Jan</span>
+        <h3 style="font-size:2rem;margin:6px 0 12px">Laguna de los Tres</h3>
+        <dl class="facts">
+          <div><dt>Distance</dt><dd class="num">≈ 22 km round trip</dd></div>
+          <div><dt>Climb</dt><dd class="num">≈ 750–900 m</dd></div>
+          <div><dt>Time</dt><dd>8–10 hours</dd></div>
+          <div><dt>Crux</dt><dd>Last 1 km gains ~400 m</dd></div>
+        </dl>
+      </div>
+      <div class="elev" id="elev">
+        <div class="tip" id="elevTip"></div>
+      </div>
+    </div>
+
+    <div class="card timeline">
+      <table>
+        <thead><tr><th>Date</th><th>Where</th><th>Plan</th><th>Moving</th><th>Sleep</th></tr></thead>
+        <tbody id="tl"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PLACES ======================= -->
+<section id="places">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="lhs">
+        <span class="eyebrow">03 · Places</span>
+        <h2>What we're going to see</h2>
+      </div>
+      <p>Hover a photo to zoom in a little. Every photo is from Wikimedia Commons; credits are at the bottom of the page.</p>
+    </div>
+    <div class="places" id="placegrid"></div>
+  </div>
+</section>
+
+<!-- ======================= BUDGET ======================= -->
+<section id="budget">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="lhs">
+        <span class="eyebrow">04 · Budget</span>
+        <h2>What it costs</h2>
+      </div>
+      <div class="seg" role="group" aria-label="Show costs for">
+        <button type="button" data-per="1" aria-pressed="true">Per person</button>
+        <button type="button" data-per="4" aria-pressed="false">Group of 4</button>
+      </div>
+    </div>
+    <div class="budget">
+      <div class="card total">
+        <span class="eyebrow">Estimated total</span>
+        <div class="big num" id="bTotal">—</div>
+        <p style="color:var(--muted);font-size:.9rem" id="bMid"></p>
+        <label class="opt"><input type="checkbox" id="optTrek"><span><b>Ice trekking on Perito Moreno</b><small>Hielo &amp; Aventura · from ARS 320,000 (2026)</small></span></label>
+        <label class="opt"><input type="checkbox" id="optTango"><span><b>Tango dinner show in Buenos Aires</b><small>Friday or Saturday night</small></span></label>
+      </div>
+      <div class="card bars" id="bars">
+        <div class="keyline"><span><i style="background:var(--glacier)"></i>Low estimate</span><span><i style="background:color-mix(in srgb,var(--glacier) 32%,transparent)"></i>Up to high estimate</span><span><i style="background:var(--steppe)"></i>Optional extra</span></div>
+        <div id="barRows"></div>
+        <div class="axis"><div></div><div class="ticks" id="ticksX"></div><div></div></div>
+        <div class="tip" id="barTip"></div>
+        <p class="note">US dollars, January 2027 high season, 2 people per room. These are estimates based on 2025–26 prices. Argentine peso prices change fast, so check again before booking. International flights depend on which Brazilian city you fly from.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PACKING ======================= -->
+<section id="packing">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="lhs">
+        <span class="eyebrow">05 · Packing</span>
+        <h2>Four seasons in one day</h2>
+      </div>
+      <p>Buenos Aires will be over 30 °C, while the Paine wind can feel close to freezing. Pack in layers. Your ticks are saved in this browser only.</p>
+    </div>
+    <div class="pack-top">
+      <span class="mono num" id="packCount">0 / 0 packed</span>
+      <div class="meter" aria-hidden="true"><i id="packMeter"></i></div>
+      <button class="btn" type="button" id="packReset">Clear ticks</button>
+    </div>
+    <div class="pack" id="pack"></div>
+  </div>
+</section>
+
+<!-- ======================= KNOW ======================= -->
+<section id="know">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="lhs">
+        <span class="eyebrow">06 · Good to know</span>
+        <h2>Field notes</h2>
+      </div>
+    </div>
+    <div class="know" id="knowgrid"></div>
+  </div>
+</section>
+
+<!-- ======================= BOOKINGS ======================= -->
+<section id="bookings">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="lhs">
+        <span class="eyebrow">07 · Bookings</span>
+        <h2>Book in this order</h2>
+      </div>
+      <p>The places that sell out first are at the top. Tap a status to move it from "To book" to "On hold" to "Booked". It's saved in this browser only.</p>
+    </div>
+    <div class="card book" id="booklist"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Made for the Patagonia '27 crew. Prices, schedules and park rules come from research in October 2026 and can change, so check each one with the operator before paying. Map data © OpenStreetMap contributors and Esri.</p>
+    <p style="margin-top:10px">Photos from Wikimedia Commons (CC BY / CC BY-SA). Click a name to see the author and license:</p>
+    <div class="credits" id="credits"></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+"use strict";
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------------- PHOTOS ---------------- */
+const IMG = {
+  ba:      "Buenos Aires - La Boca - Caminito - 200807i.jpg",
+  calafate:"Lago Argentino El Calafate (27478112564).jpg",
+  moreno:  "Perito Moreno Glacier Patagonia Argentina Luca Galuzzi 2005.JPG",
+  icetrek: "Trekking at Perito Moreno Glacier.jpg",
+  chalten: "El Chaltén, 2019.jpg",
+  fitz:    "Laguna de los Tres color.jpg",
+  fitz2:   "Los Glaciares - Fitz Roy 005.jpg",
+  torre:   "Laguna Torre and Cerro Torre (6952701790).jpg",
+  natales: "Puerto Natales, Chile1.jpg",
+  pehoe:   "Cuernos del Paine from Lake Pehoé.jpg",
+  cuernos: "Cuernos del Paine in Torres del Paine National Park.jpg",
+  torres:  "Las Torres, Torres del Paine, Chile.jpg",
+  salto:   "Salto Grande, Torres Del Paine, Chile.JPG",
+  guanaco: "Guanacos, Parque Nacional Torres del Paine, Chile5.jpg",
+  puq:     "00 2521 Punta Arenas - Chile.jpg",
+  penguin: "Magellanic penguin magdalena island boat trip 1.19.25 DSC 2059-topaz-rawdenoise.jpg"
+};
+const fp = f => encodeURIComponent(f.replace(/ /g, "_"));
+const photo = (k, w=1280) => `https://commons.wikimedia.org/wiki/Special:FilePath/${fp(IMG[k])}?width=${w}`;
+const filePage = k => `https://commons.wikimedia.org/wiki/File:${fp(IMG[k])}`;
+const imgTag = (k, alt, w) => `<img src="${photo(k,w)}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="this.remove()">`;
+
+/* ---------------- STOPS ---------------- */
+// r = region: ba | ar | cl
+const STOPS = [
+  {id:"ba",   n:1,  name:"Buenos Aires",        r:"ba", ll:[-34.6037,-58.3816], days:[0,1,2], img:"ba",       note:"Fly in from Brazil to Aeroparque (AEP). Palermo base, San Telmo, La Boca, Recoleta."},
+  {id:"fte",  n:2,  name:"El Calafate",         r:"ar", ll:[-50.3379,-72.2648], days:[2,3,6], img:"calafate", note:"Gateway town on Lago Argentino. Airport FTE. Pick up and return the Argentine rental car here."},
+  {id:"pm",   n:3,  name:"Perito Moreno Glacier",r:"ar",ll:[-50.4706,-73.0345], days:[3],     img:"moreno",   note:"About 80 km from town. Boardwalks face a 5 km-wide ice front."},
+  {id:"cha",  n:4,  name:"El Chaltén",          r:"ar", ll:[-49.3315,-72.8863], days:[4,5,6], img:"chalten",  note:"Argentina's trekking capital. Trails start right from the village."},
+  {id:"lt",   n:5,  name:"Laguna de los Tres",  r:"ar", ll:[-49.2716,-73.0019], days:[5],     img:"fitz",     note:"Glacial lake at the foot of Fitz Roy (3,405 m)."},
+  {id:"ltor", n:6,  name:"Laguna Torre",        r:"ar", ll:[-49.3289,-73.0822], days:[6],     img:"torre",    note:"Flatter hike to the lake below Cerro Torre (3,128 m)."},
+  {id:"pnt",  n:7,  name:"Puerto Natales",      r:"cl", ll:[-51.7236,-72.4875], days:[7],     img:"natales",  note:"Chilean fjord town. Pick up the rental SUV here."},
+  {id:"peh",  n:8,  name:"Lago Pehoé",          r:"cl", ll:[-51.0857,-73.0517], days:[7,8,9], img:"pehoe",    note:"Our two nights inside Torres del Paine, facing the Cuernos."},
+  {id:"sal",  n:9,  name:"Salto Grande",        r:"cl", ll:[-51.0200,-73.0067], days:[8],     img:"salto",    note:"Turquoise waterfall. Easy walk to Mirador Cuernos."},
+  {id:"tor",  n:10, name:"Base de las Torres",  r:"cl", ll:[-50.9420,-72.9670], days:[8],     img:"torres",   note:"The three granite towers. Full-day hike, needs a timed ticket."},
+  {id:"puq",  n:11, name:"Punta Arenas",        r:"cl", ll:[-53.1638,-70.9171], days:[9,10],  img:"puq",      note:"City on the Strait of Magellan. Return the car, fly home from PUQ."},
+  {id:"mag",  n:12, name:"Isla Magdalena",      r:"cl", ll:[-52.9180,-70.5780], days:[10],    img:"penguin",  note:"Island with tens of thousands of Magellanic penguins. Boat trip, about 4–5 h."}
+];
+const S = Object.fromEntries(STOPS.map(s => [s.id, s]));
+
+/* ---------------- DAYS ---------------- */
+const DAYS = [
+  {d:7,  ic:"city", dow:"Thu", r:"ba", tag:"BA",       title:"Wheels up",                 img:"ba",
+   plan:["Evening flight from Brazil to Buenos Aires. Aim for Aeroparque (AEP), the airport in the city","Check in to an apartment for 4 in Palermo","Late empanadas. Dinner starts at 22:00 here"],
+   move:"Flight Brazil → AEP (~3 h)", sleep:"Buenos Aires · Palermo", wx:"30° / 20°", sun:"Sunset ~20:10", stops:["ba"]},
+  {d:8,  ic:"city", dow:"Fri", r:"ba", tag:"BA",       title:"Remote work, then parrilla",img:"ba",
+   plan:["Work from a Palermo café or coworking space. Same time zone as Brasília","Steak dinner at a parrilla","Friday night out in Palermo Soho"],
+   move:"On foot / taxi", sleep:"Buenos Aires · Palermo", wx:"30° / 20°", sun:"Sunset ~20:10", stops:["ba"]},
+  {d:9,  ic:"plane", dow:"Sat", r:"ba", tag:"BA → FTE", title:"City day, fly south",       img:"ba",
+   plan:["Morning: San Telmo and the colored houses of Caminito in La Boca","Afternoon: Recoleta Cemetery","Evening flight AEP → El Calafate (~3 h 15). Pick up the rental car at the airport if the desk is open, or in town on Sunday morning"],
+   move:"Flight AEP → FTE (3 h 15)", sleep:"El Calafate", wx:"30° → 19°", sun:"Sunset ~22:00 in Calafate", stops:["ba","fte"]},
+  {d:10, ic:"ice", dow:"Sun", r:"ar", tag:"Glacier",  title:"Perito Moreno Glacier",     img:"moreno",
+   plan:["Drive to the glacier in the rental car, about 1 h 15 each way. Leave early to arrive before the tour buses","Walk the boardwalks and wait for ice to break off the front","Optional: ice trekking on the glacier, or the boat in front of the ice wall"],
+   move:"Rental car · 80 km each way", sleep:"El Calafate", wx:"19° / 7°", sun:"Sunset ~22:00", stops:["fte","pm"]},
+  {d:11, ic:"bus", dow:"Mon", r:"ar", tag:"Chaltén",  title:"North to El Chaltén",       img:"chalten",
+   plan:["Drive Ruta 40 north (215 km), with a coffee stop at the historic La Leona roadhouse","Watch for Fitz Roy on the approach, then a short evening hike to Mirador de los Cóndores (1–2 h)","Check in to Hostería El Pilar, 17 km past the village. The car makes this easy"],
+   move:"Rental car Calafate → Chaltén (~2 h 45)", sleep:"El Chaltén · Hostería El Pilar", wx:"17° / 6°", sun:"Sunset ~22:00", stops:["fte","cha"]},
+  {d:12, ic:"boot", dow:"Tue", r:"ar", tag:"Fitz Roy", title:"Laguna de los Tres",        img:"fitz",
+   plan:["Start early from the El Pilar trailhead. The best light on Fitz Roy is in the morning","Steady trail through lenga forest, then a steep last kilometer","Lunch at the lake, then celebrate with craft beer in the village"],
+   move:"On foot · ≈ 22 km", sleep:"El Chaltén · Hostería El Pilar", wx:"17° / 6°", sun:"Sunset ~22:00", stops:["cha","lt"]},
+  {d:13, ic:"boot", dow:"Wed", r:"ar", tag:"Spare",    title:"Laguna Torre or weather day",img:"torre",
+   plan:["If yesterday was cloudy, try Fitz Roy again today","Otherwise: Laguna Torre (≈ 18 km, mostly flat) to see Cerro Torre","Drive back to El Calafate whenever suits you, refuel and return the car"],
+   move:"Rental car Chaltén → Calafate · return it", sleep:"El Calafate", wx:"17° / 6°", sun:"Sunset ~22:00", stops:["cha","ltor","fte"]},
+  {d:14, ic:"car", dow:"Thu", r:"cl", tag:"→ Chile",  title:"Across the border",         img:"natales",
+   plan:["Early bus to Puerto Natales, 5–6 h including the border. The Argentine car stays in Argentina","Pick up the SUV and drive into Torres del Paine (~2 h)","Sunset over the Cuernos from Lago Pehoé"],
+   move:"Bus Calafate → Natales · SUV to park", sleep:"Torres del Paine · Hostería Pehoé", wx:"16° / 6°", sun:"Sunset ~22:00", stops:["fte","pnt","peh"]},
+  {d:15, ic:"peak", dow:"Fri", r:"cl", tag:"Paine",    title:"Torres del Paine",          img:"torres",
+   plan:["Option A: Base de las Torres hike (≈ 20 km, 8–10 h, needs a timed ticket)","Option B: road trip to Salto Grande, Mirador Cuernos, Laguna Amarga and Lago Grey","Guanacos everywhere. Condors if you're lucky"],
+   move:"SUV on park roads (gravel)", sleep:"Torres del Paine · Hostería Pehoé", wx:"16° / 6°", sun:"Sunset ~22:00", stops:["peh","sal","tor"]},
+  {d:16, ic:"car", dow:"Sat", r:"cl", tag:"PUQ",      title:"Drive to the Strait",       img:"puq",
+   plan:["Leave the park after breakfast, ~4.5 h drive","Backup: a 15:00 Magdalena boat if one is running in peak season","Return the car, then king crab (centolla) for dinner"],
+   move:"SUV park → Punta Arenas (~390 km)", sleep:"Punta Arenas", wx:"15° / 7°", sun:"Sunset ~22:00", stops:["peh","puq"]},
+  {d:17, ic:"penguin", dow:"Sun", r:"cl", tag:"Penguins", title:"The penguins, then home",   img:"penguin",
+   plan:["Early boat to Isla Magdalena. Peak season departures are around 06:30","Walk the trail through the penguin colony. The chicks hatch in January","Afternoon flight PUQ → Santiago → Brazil on one ticket"],
+   move:"Boat · flight PUQ → SCL → home", sleep:"Home", wx:"15° / 7°", sun:"—", stops:["puq","mag"]}
+];
+const GLYPH = {
+  city:'<path d="M3 21V9l5-3v15M8 21V4l7 3v14M15 21v-9l6 2v7M2 21h20"/>',
+  plane:'<path d="M2 16l20-7-3 9-6-3-3 5-1-6z"/>',
+  ice:'<path d="M2 20l4-10 3 4 3-8 3 6 2-3 5 11z"/><path d="M2 20h20"/>',
+  bus:'<rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M7 20v-3M17 20v-3"/>',
+  boot:'<path d="M6 3h6v8l6 3c2 1 3 2 3 4v2H3V3z"/>',
+  car:'<path d="M3 16v-4l2-5h14l2 5v4z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>',
+  peak:'<path d="M2 21L9 5l3 6 2-4 8 14z"/><path d="M9 5l-2 5 2-1 2 2"/>',
+  penguin:'<path d="M12 3c3 0 4 3 4 5 2 3 3 7 1 11H7C5 15 6 11 8 8c0-2 1-5 4-5z"/><path d="M10 7h.01M14 7h.01M11 9h2"/>'
+};
+const glyph = k => `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${GLYPH[k]}</svg>`;
+const RLAB = {ba:"Buenos Aires", ar:"Argentina", cl:"Chile"};
+
+/* ---------------- ROUTE SEGMENTS ---------------- */
+const MODE = {
+  flight:{label:"Flight", color:"--glacier", dash:"8 8", w:2.5},
+  bus:   {label:"Bus", color:"--steppe", dash:null, w:3},
+  car:   {label:"Rental car", color:"--lenga", dash:null, w:3},
+  hike:  {label:"Hike", color:"--ink", dash:"2 6", w:2.5},
+  boat:  {label:"Boat", color:"--glacier", dash:"1 6", w:3.5}
+};
+function arc(a, b, bend=0.18, n=40){
+  const [y1,x1]=a,[y2,x2]=b, mx=(x1+x2)/2, my=(y1+y2)/2, dx=x2-x1, dy=y2-y1;
+  const cx=mx - dy*bend, cy=my + dx*bend, pts=[];
+  for(let i=0;i<=n;i++){const t=i/n; pts.push([(1-t)*(1-t)*y1+2*(1-t)*t*cy+t*t*y2,(1-t)*(1-t)*x1+2*(1-t)*t*cx+t*t*x2]);}
+  return pts;
+}
+const SCL=[-33.45,-70.67];
+const SEGS = [
+  {m:"flight", pts:arc(S.ba.ll, S.fte.ll, -0.2), lab:"AEP → FTE · 3 h 15"},
+  {m:"car", pts:[S.fte.ll,[-50.39,-72.6],[-50.45,-72.9],S.pm.ll]},
+  {m:"car", pts:[S.fte.ll,[-50.15,-72.0],[-49.75,-72.08],[-49.55,-72.5],S.cha.ll], lab:"215 km · Ruta 40"},
+  {m:"hike", pts:[S.cha.ll,[-49.305,-72.93],[-49.285,-72.97],S.lt.ll]},
+  {m:"hike", pts:[S.cha.ll,[-49.33,-72.95],[-49.33,-73.03],S.ltor.ll]},
+  {m:"bus", pts:[S.fte.ll,[-50.62,-71.98],[-51.05,-71.80],[-51.23,-72.22],[-51.27,-72.34],[-51.5,-72.42],S.pnt.ll], lab:"Border · 5–6 h"},
+  {m:"car", pts:[S.pnt.ll,[-51.57,-72.62],[-51.33,-72.98],[-51.18,-73.0],S.peh.ll]},
+  {m:"car", pts:[S.peh.ll,S.sal.ll,[-50.98,-72.82],[-50.96,-72.9],S.tor.ll]},
+  {m:"car", pts:[S.pnt.ll,[-52.05,-71.45],[-52.4,-71.2],[-52.75,-70.98],S.puq.ll], lab:"≈ 390 km"},
+  {m:"boat", pts:arc(S.puq.ll, S.mag.ll, 0.25, 20)},
+  {m:"flight", pts:arc(S.puq.ll, SCL, 0.12), lab:"→ Santiago → Brazil"}
+];
+
+/* ---------------- MAP ---------------- */
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const isDark = () => {
+  const t = document.documentElement.getAttribute("data-theme");
+  if (t) return t === "dark";
+  return matchMedia("(prefers-color-scheme: dark)").matches;
+};
+let map, tiles, lines = [], markers = {}, mapOK = typeof L !== "undefined";
+const PAT_BOUNDS = [[-48.9,-74.2],[-53.4,-70.2]];
+function tileLayer(){
+  return isDark()
+    ? L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",{maxZoom:16,attribution:'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors'})
+    : L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors'});
+}
+function drawLines(){
+  lines.forEach(l => l.remove()); lines = [];
+  SEGS.forEach(sg => {
+    const m = MODE[sg.m];
+    const casing = L.polyline(sg.pts,{color:css("--surface"),weight:m.w+3,opacity:.85,interactive:false}).addTo(map);
+    const pl = L.polyline(sg.pts,{color:css(m.color),weight:m.w,dashArray:m.dash,lineCap:"round",opacity:.95}).addTo(map);
+    pl.bindTooltip(m.label + (sg.lab ? " · " + sg.lab : ""),{sticky:true,className:"route-label",direction:"top"});
+    lines.push(casing, pl);
+  });
+  Object.values(markers).forEach(mk => mk.bringToFront && mk.bringToFront());
+}
+function initMap(){
+  if (!mapOK){ $("#map").innerHTML = '<p style="padding:20px;color:var(--muted)">The map could not load. Check your connection.</p>'; return; }
+  map = L.map("map",{scrollWheelZoom:false,zoomSnap:.25,attributionControl:true}).fitBounds(PAT_BOUNDS);
+  tiles = tileLayer().addTo(map);
+  drawLines();
+  STOPS.forEach(s => {
+    const icon = L.divIcon({className:"",html:`<div class="pin ${s.r}" data-pin="${s.id}">${s.n}</div>`,iconSize:[30,30],iconAnchor:[15,15],popupAnchor:[0,-14]});
+    const dlist = s.days.map(i => `${DAYS[i].dow} ${DAYS[i].d}`).join(" · ");
+    const mk = L.marker(s.ll,{icon,title:s.name,riseOnHover:true}).addTo(map)
+      .bindPopup(`${imgTag(s.img, s.name, 500)}<b>${esc(s.name)}</b><div class="mono" style="color:var(--muted);margin:4px 0 6px">${dlist} Jan</div><div style="font-size:.86rem;line-height:1.4">${esc(s.note)}</div>`);
+    mk.on("click", () => highlightStop(s.id, false));
+    markers[s.id] = mk;
+  });
+  map.on("click", () => map.scrollWheelZoom.enable());
+  map.on("mouseout", () => map.scrollWheelZoom.disable());
+}
+function setView(v){
+  $$('[data-view]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  if (!map) return;
+  if (v === "all") map.flyToBounds(L.latLngBounds([S.ba.ll, S.puq.ll, SCL, S.cha.ll]).pad(.08),{duration:.9});
+  else map.flyToBounds(PAT_BOUNDS,{duration:.9});
+}
+function highlightStop(id, pan=true){
+  $$(".pin").forEach(p => p.classList.toggle("hi", p.dataset.pin === id));
+  $$(".stop").forEach(b => b.classList.toggle("on", b.dataset.id === id));
+  if (map && pan){ const s=S[id]; map.flyTo(s.ll, Math.max(map.getZoom(), id==="ba" ? 9 : 10), {duration:.8}); markers[id].openPopup(); }
+}
+function focusDay(i){
+  if (!map) return;
+  const ids = DAYS[i].stops;
+  $$(".pin").forEach(p => p.classList.toggle("hi", ids.includes(p.dataset.pin)));
+  const pts = ids.map(id => S[id].ll);
+  if (pts.length === 1) map.flyTo(pts[0], ids[0]==="ba" ? 11 : 11, {duration:.8});
+  else map.flyToBounds(L.latLngBounds(pts).pad(.35),{duration:.8,maxZoom:11});
+}
+
+/* stop list + legend */
+$("#stoplist").innerHTML = STOPS.map(s => `
+  <button type="button" class="stop" data-id="${s.id}">
+    <span class="n ${s.r}">${s.n}</span>
+    <span><b>${esc(s.name)}</b><small>${esc(s.note)}</small></span>
+  </button>`).join("");
+$$(".stop").forEach(b => b.addEventListener("click", () => { highlightStop(b.dataset.id); }));
+$("#legend").innerHTML = Object.values(MODE).map(m =>
+  `<span><svg width="34" height="8"><line x1="2" y1="4" x2="32" y2="4" stroke="var(${m.color})" stroke-width="${m.w}" stroke-linecap="round" ${m.dash ? `stroke-dasharray="${m.dash}"` : ""}/></svg>${m.label}</span>`).join("")
+  + `<span><i class="dot ba"></i>Buenos Aires</span><span><i class="dot ar"></i>Argentina</span><span><i class="dot cl"></i>Chile</span>`;
+$$('[data-view]').forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+
+/* ---------------- CALENDAR ---------------- */
+const daysEl = $("#days");
+(function buildMonth(){
+  const first = new Date(2027,0,1).getDay(); // 5 = Friday
+  let html = "";
+  for (let i=0;i<first;i++) html += `<span class="day" aria-hidden="true"></span>`;
+  for (let d=1; d<=31; d++){
+    const idx = DAYS.findIndex(x => x.d === d);
+    if (idx > -1){
+      const D = DAYS[idx];
+      html += `<button type="button" class="day trip ${D.r}" data-i="${idx}" aria-label="${D.dow} ${d} January: ${esc(D.title)}"><span class="num">${d}</span><span class="tag">${glyph(D.ic)}</span></button>`;
+    } else html += `<span class="day num">${d}</span>`;
+  }
+  daysEl.innerHTML = html;
+})();
+$("#tl").innerHTML = DAYS.map((D,i) => `<tr data-i="${i}" tabindex="0"><td>${D.dow} ${D.d} Jan</td><td><span class="chip ${D.r}">${RLAB[D.r]}</span></td><td><b>${esc(D.title)}</b></td><td>${esc(D.move)}</td><td>${esc(D.sleep)}</td></tr>`).join("");
+
+let cur = store.get("pt27-day", 0);
+function showDay(i, fromUser){
+  cur = Math.max(0, Math.min(DAYS.length-1, i));
+  const D = DAYS[cur];
+  $$(".day.trip").forEach(b => b.classList.toggle("on", +b.dataset.i === cur));
+  $$("#tl tr").forEach(r => r.classList.toggle("on", +r.dataset.i === cur));
+  $("#detail").innerHTML = `
+    <div class="ph">${imgTag(D.img, D.title, 1280)}
+      <div class="cap"><span class="chip">Day ${cur+1} of 11</span><span class="chip">${RLAB[D.r]}</span></div>
+    </div>
+    <div class="body">
+      <div class="when"><span class="eyebrow">${D.dow} · ${D.d} January 2027</span><span class="chip ${D.r}">${esc(D.tag)}</span></div>
+      <h3>${esc(D.title)}</h3>
+      <ul>${D.plan.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+      <dl class="facts">
+        <div><dt>Moving</dt><dd>${esc(D.move)}</dd></div>
+        <div><dt>Sleep</dt><dd>${esc(D.sleep)}</dd></div>
+        <div><dt>Typical high / low</dt><dd class="num">${esc(D.wx)} C</dd></div>
+        <div><dt>Light</dt><dd>${esc(D.sun)}</dd></div>
+      </dl>
+      <div class="daynav">
+        <button type="button" class="btn" id="prevD" ${cur===0?"disabled":""}>← Prev</button>
+        <button type="button" class="btn" id="nextD" ${cur===DAYS.length-1?"disabled":""}>Next →</button>
+        <a class="btn primary" href="#route" id="mapD">See on map</a>
+      </div>
+    </div>`;
+  $("#prevD").onclick = () => showDay(cur-1, true);
+  $("#nextD").onclick = () => showDay(cur+1, true);
+  $("#mapD").onclick = () => setTimeout(() => focusDay(cur), 350);
+  store.set("pt27-day", cur);
+  if (fromUser) focusDay(cur);
+}
+daysEl.addEventListener("click", e => { const b = e.target.closest(".day.trip"); if (b) showDay(+b.dataset.i, true); });
+$("#tl").addEventListener("click", e => { const r = e.target.closest("tr"); if (r) showDay(+r.dataset.i, true); });
+$("#tl").addEventListener("keydown", e => { if (e.key==="Enter"){ const r = e.target.closest("tr"); if (r) showDay(+r.dataset.i, true); } });
+
+/* ---------------- ELEVATION PROFILE ---------------- */
+(function elevation(){
+  // approximate profile, El Chaltén village → Laguna de los Tres (one way)
+  const P = [[0,410,"El Chaltén"],[1,480],[2,570],[3,660],[4,730,"Laguna Capri turnoff"],[5,745],[6,755],[7,765],[8,775],[9,785,"Camp Poincenot"],[9.7,800,"Río Blanco"],[10.2,900],[10.6,1030],[11,1170,"Laguna de los Tres"]];
+  const W=640,H=220,ml=44,mr=14,mt=16,mb=30, x0=0,x1=11, y0=300,y1=1300;
+  const X = k => ml + (k-x0)/(x1-x0)*(W-ml-mr), Y = m => mt + (1-(m-y0)/(y1-y0))*(H-mt-mb);
+  const line = P.map((p,i) => (i?"L":"M")+X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)).join("");
+  const area = line + `L${X(11)},${Y(y0)}L${X(0)},${Y(y0)}Z`;
+  let g = "";
+  [400,800,1200].forEach(m => g += `<line x1="${ml}" x2="${W-mr}" y1="${Y(m)}" y2="${Y(m)}" stroke="var(--line)"/><text x="${ml-8}" y="${Y(m)+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="JetBrains Mono,monospace">${m} m</text>`);
+  [0,2,4,6,8,10].forEach(k => g += `<text x="${X(k)}" y="${H-10}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="JetBrains Mono,monospace">${k} km</text>`);
+  const labs = P.filter(p => p[2] && p[0] !== 0 && p[0] !== 9.7).map(p => `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="4" fill="var(--glacier)" stroke="var(--surface)" stroke-width="2"/><text x="${X(p[0]) - (p[0]===11?8:0)}" y="${Y(p[1])-10}" text-anchor="${p[0]===11?"end":"middle"}" font-size="11" fill="var(--ink)" font-family="Hanken Grotesk,sans-serif" font-weight="600">${p[2]}</text>`).join("");
+  $("#elev").insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Elevation profile: from 410 m in El Chaltén to 1,170 m at Laguna de los Tres over 11 km. The last kilometer gains about 400 m.">
+    <defs><linearGradient id="eg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--glacier)" stop-opacity=".35"/><stop offset="1" stop-color="var(--glacier)" stop-opacity=".02"/></linearGradient></defs>
+    ${g}<path d="${area}" fill="url(#eg)"/><path d="${line}" fill="none" stroke="var(--glacier)" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="${X(9.7)}" y="${mt}" width="${X(11)-X(9.7)}" height="${H-mt-mb}" fill="var(--lenga)" opacity=".08"/>
+    <text x="${X(10.35)}" y="${H-mb-6}" text-anchor="middle" font-size="9" fill="var(--lenga)" font-family="JetBrains Mono,monospace">STEEP</text>
+    ${labs}
+    <circle id="eDot" r="5" fill="var(--ink)" stroke="var(--surface)" stroke-width="2" opacity="0"/>
+    <line id="eLine" y1="${mt}" y2="${H-mb}" stroke="var(--muted)" stroke-dasharray="3 3" opacity="0"/>
+    <rect x="${ml}" y="${mt}" width="${W-ml-mr}" height="${H-mt-mb}" fill="transparent" id="eHit"/>
+  </svg>`);
+  const svg = $("#elev svg"), tip = $("#elevTip"), dot = $("#eDot"), ln = $("#eLine");
+  const interp = k => { for (let i=1;i<P.length;i++){ if (k<=P[i][0]){ const [a,b]=[P[i-1],P[i]]; return a[1]+(b[1]-a[1])*(k-a[0])/(b[0]-a[0]); } } return P[P.length-1][1]; };
+  function move(ev){
+    const r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) * W / r.width;
+    const k = Math.max(0, Math.min(11, (sx-ml)/(W-ml-mr)*11)), m = interp(k);
+    dot.setAttribute("cx", X(k)); dot.setAttribute("cy", Y(m)); dot.setAttribute("opacity", 1);
+    ln.setAttribute("x1", X(k)); ln.setAttribute("x2", X(k)); ln.setAttribute("opacity", .7);
+    tip.textContent = `km ${k.toFixed(1)} · ${Math.round(m/10)*10} m`;
+    tip.style.left = (X(k) * r.width / W) + "px"; tip.style.top = (Y(m) * r.height / H) + "px"; tip.classList.add("show");
+  }
+  $("#eHit").addEventListener("pointermove", move);
+  $("#eHit").addEventListener("pointerleave", () => { tip.classList.remove("show"); dot.setAttribute("opacity",0); ln.setAttribute("opacity",0); });
+})();
+
+/* ---------------- PLACES ---------------- */
+const PLACES = [
+  {k:"moreno", t:"Perito Moreno", s:"An ice front about 5 km wide and up to ~70 m above the lake. Blocks break off all day.", m:"Los Glaciares NP · Sun 10", c:"w8 tall"},
+  {k:"penguin",t:"Isla Magdalena",s:"Magellanic penguins nest here from October to March. In January there are chicks.", m:"Strait of Magellan · Sun 17", c:"tall"},
+  {k:"fitz",   t:"Fitz Roy",      s:"3,405 m of granite above Laguna de los Tres. The Tehuelche called it Chaltén, \"smoking mountain\".", m:"El Chaltén · Tue 12", c:"w6"},
+  {k:"cuernos",t:"Cuernos del Paine",s:"Granite \"horns\" with dark sedimentary caps, mirrored in Lago Pehoé.", m:"Torres del Paine · Thu 14 – Sat 16", c:"w6"},
+  {k:"torres", t:"Las Torres",    s:"Three granite towers above a glacial lake. Best seen at sunrise.", m:"Torres del Paine · Fri 15"},
+  {k:"torre",  t:"Cerro Torre",   s:"A 3,128 m spire, often in its own cloud, above Laguna Torre.", m:"El Chaltén · Wed 13"},
+  {k:"salto",  t:"Salto Grande",  s:"Turquoise water from Lago Nordenskjöld pours toward Pehoé. Expect strong wind on the trail.", m:"Torres del Paine · Fri 15"},
+  {k:"guanaco",t:"Guanacos",      s:"Wild relatives of the llama, all over the park roads. Rheas and condors live here too.", m:"Torres del Paine", c:"w6"},
+  {k:"ba",     t:"Caminito",      s:"The painted tin houses of La Boca, where tango started.", m:"Buenos Aires · Sat 9", c:"w6"},
+  {k:"calafate",t:"Lago Argentino",s:"Argentina's largest lake, milky-blue from glacier silt.", m:"El Calafate · Sat 9 – Wed 13"},
+  {k:"chalten",t:"El Chaltén",    s:"A tiny village founded in 1985, with trailheads at the end of its streets.", m:"Mon 11 – Wed 13"},
+  {k:"natales",t:"Puerto Natales",s:"A fjord town on Última Esperanza Sound, the last stop before the park.", m:"Thu 14"}
+];
+$("#placegrid").innerHTML = PLACES.map(p => `<figure class="place ${p.c||""}" style="margin:0">${imgTag(p.k, p.t, /w8|w6/.test(p.c||"") ? 1280 : 960)}<figcaption class="ov"><span class="mono">${esc(p.m)}</span><b>${esc(p.t)}</b><span>${esc(p.s)}</span></figcaption></figure>`).join("");
+
+/* ---------------- BUDGET ---------------- */
+const COSTS = [
+  {k:"Lodging",       d:"10 nights, 2 per room, with El Pilar & Pehoé", lo:750, hi:1050},
+  {k:"Flights",       d:"Brazil → BA · BA → Calafate · PUQ → Brazil",    lo:550, hi:900},
+  {k:"Food & drinks", d:"≈ US$45–70 a day",                              lo:450, hi:700},
+  {k:"Rental cars",   d:"Argentina 4 days + Chile 3 days one-way, fuel, ÷ 4", lo:215, hi:330},
+  {k:"Bus & transfers", d:"Calafate → Natales bus, airport rides",       lo:70,  hi:100},
+  {k:"Isla Magdalena",d:"Penguin boat, half day",                        lo:110, hi:160},
+  {k:"Park tickets",  d:"Los Glaciares + Torres del Paine",              lo:90,  hi:130}
+];
+const OPTS = {optTrek:{k:"Ice trekking", d:"Perito Moreno, optional", lo:250, hi:300}, optTango:{k:"Tango show", d:"Dinner + show, optional", lo:60, hi:100}};
+let per = 1;
+const opts = store.get("pt27-opts", {optTrek:false, optTango:false});
+const usd = n => "US$" + Math.round(n).toLocaleString("en-US");
+function renderBudget(){
+  const rows = COSTS.map(c => ({...c})).concat(Object.entries(OPTS).filter(([id]) => opts[id]).map(([,o]) => ({...o, opt:true})));
+  const max = Math.max(...rows.map(r => r.hi)) * per;
+  const step = per === 1 ? 250 : 1000, top = Math.ceil(max/step)*step;
+  const pct = v => (v*per/top*100).toFixed(2) + "%";
+  $("#barRows").innerHTML = rows.map((r,i) => `
+    <div class="bar-row" data-i="${i}">
+      <div class="lbl"><b>${esc(r.k)}</b><small>${esc(r.d)}</small></div>
+      <div class="track ${r.opt?"opt-bar":""}">
+        ${Array.from({length: top/step + 1}, (_,j) => `<span class="g" style="left:${(j*step/top*100).toFixed(2)}%"></span>`).join("")}
+        <span class="lo" style="width:${pct(r.lo)}"></span>
+        <span class="hi" style="left:calc(${pct(r.lo)} + 2px);width:calc(${pct(r.hi - r.lo)} - 2px)"></span>
+      </div>
+      <div class="val num">${usd(r.lo*per)}–${(r.hi*per).toLocaleString("en-US")}</div>
+    </div>`).join("");
+  $("#ticksX").innerHTML = Array.from({length: top/step + 1}, (_,j) => `<span style="left:${(j*step/top*100).toFixed(2)}%">${j*step >= 1000 ? (j*step/1000)+"k" : j*step}</span>`).join("");
+  const lo = rows.reduce((a,r) => a + r.lo, 0) * per, hi = rows.reduce((a,r) => a + r.hi, 0) * per;
+  $("#bTotal").innerHTML = `${usd(lo)}<br>– ${hi.toLocaleString("en-US")}<small>${per === 1 ? "per person" : "for the group of 4"}</small>`;
+  $("#bMid").textContent = `Midpoint ≈ ${usd((lo+hi)/2)}${per===1 ? ` · ≈ ${usd((lo+hi)/2/11)} a day` : " · split four ways"}.`;
+  // tooltips
+  const tip = $("#barTip"), host = $("#bars");
+  $$(".bar-row").forEach(row => {
+    const r = rows[+row.dataset.i];
+    row.addEventListener("pointermove", ev => {
+      const hr = host.getBoundingClientRect();
+      tip.innerHTML = `${esc(r.k)}: ${usd(r.lo*per)} – ${usd(r.hi*per)}`;
+      tip.style.left = (ev.clientX - hr.left) + "px"; tip.style.top = (ev.clientY - hr.top) + "px"; tip.classList.add("show");
+    });
+    row.addEventListener("pointerleave", () => tip.classList.remove("show"));
+  });
+}
+$$('[data-per]').forEach(b => b.addEventListener("click", () => { per = +b.dataset.per; $$('[data-per]').forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderBudget(); }));
+Object.keys(OPTS).forEach(id => { const el = $("#"+id); el.checked = !!opts[id]; el.addEventListener("change", () => { opts[id] = el.checked; store.set("pt27-opts", opts); renderBudget(); }); });
+
+/* ---------------- PACKING ---------------- */
+const ICON = {
+  doc:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--glacier)" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
+  layer:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--glacier)" stroke-width="1.8"><path d="M3 20 9 8l4 6 3-4 5 10z"/><path d="M9 8l1.5 3L12 10"/></svg>',
+  boot:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--glacier)" stroke-width="1.8"><path d="M6 3h6v8l6 3c2 1 3 2 3 4v2H3V3z"/><path d="M3 16h18"/></svg>',
+  gear:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--glacier)" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 5l2 7-2 7-2-7z" fill="var(--lenga)" stroke="none"/></svg>',
+  plug:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--glacier)" stroke-width="1.8"><path d="M8 3v5M16 3v5M6 8h12v4a6 6 0 0 1-12 0zM12 18v3"/></svg>',
+  med:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--glacier)" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M12 10v6M9 13h6M9 6V4h6v2"/></svg>'
+};
+const PACK = [
+  {h:"Documents & money", i:"doc", items:[
+    ["Brazilian RG or passport","Both work in Argentina and Chile. The RG must be in good condition, and a recent one is safer"],
+    ["Driver's license (physical card)","For both rental cars. Two drivers, both on each contract. An International Driving Permit is cheap extra insurance"],
+    ["Torres del Paine park ticket","Buy at pasesparques.cl at least 24 h ahead. Not refundable"],
+    ["Travel insurance","Covers medical care, evacuation and missed connections"],
+    ["Credit card + some US$ cash","In Argentina, foreign cards get a near-market exchange rate"],
+    ["A few Chilean pesos","For park toilets, snacks and tips"]
+  ]},
+  {h:"Layers", i:"layer", items:[
+    ["Waterproof, windproof shell jacket","The most important item. Gusts can pass 100 km/h"],
+    ["Light down or synthetic puffy","For cold mornings at the lakes"],
+    ["Fleece mid-layer",""],
+    ["Two merino or synthetic base layers","No cotton on hike days"],
+    ["Hiking trousers + rain trousers",""],
+    ["Beanie, buff and light gloves","Even in January"],
+    ["Summer clothes for Buenos Aires","30 °C+. Shorts and sandals"],
+    ["One nice outfit","For the parrilla and tango night"]
+  ]},
+  {h:"Feet & trail", i:"boot", items:[
+    ["Broken-in hiking boots","Don't buy them the week before"],
+    ["Hiking socks ×3 + blister kit",""],
+    ["20–30 L daypack with rain cover",""],
+    ["Trekking poles","Your knees will thank you on the last km to Laguna de los Tres"],
+    ["1 L water bottle","Stream water in El Chaltén is generally drinkable"],
+    ["Trail snacks","Buy them in El Chaltén. Don't carry fresh food into Chile"]
+  ]},
+  {h:"Sun & weather", i:"gear", items:[
+    ["Sunglasses (category 3+)","UV is strong this far south"],
+    ["SPF 50 sunscreen + lip balm",""],
+    ["Sleep mask","It stays light until about 22:00"],
+    ["Ziplock bags","For phones and passports in the rain"]
+  ]},
+  {h:"Tech", i:"plug", items:[
+    ["Universal travel adapter","Argentina uses Type I plugs, Chile uses Type C/L"],
+    ["Power bank","There are no outlets on the trails"],
+    ["Offline maps downloaded","There is no signal in most of Torres del Paine"],
+    ["eSIM for Argentina + Chile",""],
+    ["Headlamp","For the early start on Base Torres day"]
+  ]},
+  {h:"Health", i:"med", items:[
+    ["Motion sickness tablets","For the boat across the Strait of Magellan"],
+    ["Painkillers / ibuprofen",""],
+    ["Personal prescriptions","Bring them in the original packaging"],
+    ["Hand sanitizer + tissues","For trailhead toilets"]
+  ]}
+];
+let packed = store.get("pt27-pack", {});
+$("#pack").innerHTML = PACK.map((g,gi) => `
+  <div class="card"><h3>${ICON[g.i]}${esc(g.h)}</h3>
+    ${g.items.map((it,ii) => { const id = `p${gi}-${ii}`; return `<label class="item" for="${id}"><input type="checkbox" id="${id}" ${packed[id]?"checked":""}><span>${esc(it[0])}${it[1] ? `<small>${esc(it[1])}</small>` : ""}</span></label>`; }).join("")}
+  </div>`).join("");
+function packProgress(){
+  const all = $$("#pack input"), n = all.filter(x => x.checked).length;
+  $("#packCount").textContent = `${n} / ${all.length} packed`;
+  $("#packMeter").style.width = (n/all.length*100) + "%";
+}
+$("#pack").addEventListener("change", e => { if (e.target.matches("input")){ packed[e.target.id] = e.target.checked; store.set("pt27-pack", packed); packProgress(); } });
+$("#packReset").addEventListener("click", () => { packed = {}; store.set("pt27-pack", packed); $$("#pack input").forEach(x => x.checked = false); packProgress(); });
+packProgress();
+
+/* ---------------- KNOW ---------------- */
+const KNOW = [
+  {t:"Chile's border checks food", a:true, p:"Chile's agricultural service (SAG) X-rays bags at the border. Fresh fruit, vegetables, meat, dairy, honey and seeds are not allowed. Eat it or bin it before the Calafate → Natales bus, or declare it. Fines are high."},
+  {t:"Park tickets go online", p:"Since the 2025/26 season, Torres del Paine sells tickets by sector with time slots, Base Torres included, only at pasesparques.cl. Buy at least 24 h ahead. Prices changed in May 2026. Los Glaciares (Perito Moreno) charges foreigners about ARS 50,000."},
+  {t:"Penguins: Magdalena only", a:true, p:"The Seno Otway colony near Punta Arenas is closed to visitors. Isla Magdalena boats run November to March, with peak season departures around 06:30, 10:00 and 15:00. Wind can cancel trips, so treat Sat 15:00 as the backup."},
+  {t:"The wind is serious", p:"Gusts over 100 km/h are normal. Hold car doors with both hands when you open them. A rental company may charge for a door bent by the wind. Hats go in the pocket at Salto Grande."},
+  {t:"Same clock everywhere", p:"Buenos Aires, Argentine Patagonia and Chile's Magallanes region all use UTC−3, the same as Brasília. No jet lag. You'll have about 17 hours of daylight, with sunset around 22:00."},
+  {t:"Plan B is built in", p:"Wed 13 is a spare day in El Chaltén. If Fitz Roy is in cloud on Tuesday, swap the hikes. Mountain forecasts: check windy.com or mountain-forecast.com each evening."},
+  {t:"Fly home on one ticket", p:"Book Punta Arenas → Santiago → Brazil as a single booking, so the airline rebooks you if wind delays the first flight. If someone has to work Monday, consider flying home Saturday instead."},
+  {t:"Money in Argentina", p:"Foreign credit cards now get a rate close to the market rate, so you don't need to carry lots of cash. Some small places in El Chaltén only take cash in pesos or US$."},
+  {t:"Two cars, one border", p:"Rent one car in El Calafate (Sun 10 – Wed 13) and a second in Puerto Natales. An Argentine rental needs a special permit to enter Chile and usually can't be dropped off there, so the Calafate → Natales leg is by bus. The roads to the glacier and El Chaltén are paved. Torres del Paine roads are gravel, so keep under 60 km/h, watch for guanacos and fill up in Natales. There's no fuel inside the park."}
+];
+$("#knowgrid").innerHTML = KNOW.map(k => `<div class="card ${k.a?"alert":""}"><h3>${esc(k.t)}</h3><p>${esc(k.p)}</p></div>`).join("");
+
+/* ---------------- BOOKINGS ---------------- */
+const BOOK = [
+  {t:"Torres del Paine stay", s:"Hostería Pehoé (island, Cuernos view) or Hotel Río Serrano · Thu 14 – Sat 16, 2 nights", u:"https://www.google.com/maps/search/?api=1&query=Hosteria+Pehoe+Torres+del+Paine", l:"Find"},
+  {t:"Hostería El Pilar", s:"El Chaltén · Mon 11 – Wed 13, 2 nights", u:"https://www.google.com/maps/search/?api=1&query=Hosteria+El+Pilar+El+Chalten", l:"Find"},
+  {t:"Flights", s:"Brazil → AEP (Thu 7) · AEP → FTE (Sat 9 evening) · PUQ → SCL → Brazil (Sun 17), on one ticket", u:"https://www.google.com/travel/flights", l:"Search"},
+  {t:"Rental car in El Calafate", s:"Sun 10 – Wed 13 · pick up and return in El Calafate (town or airport FTE) · room for 4 + luggage", u:"https://www.google.com/search?q=rent+a+car+El+Calafate", l:"Search"},
+  {t:"Rental SUV in Chile, one-way", s:"Pick up Puerto Natales Thu 14 → drop off Punta Arenas Sat 16", u:"https://www.google.com/search?q=rent+a+car+Puerto+Natales+one+way+Punta+Arenas", l:"Search"},
+  {t:"Isla Magdalena boat", s:"Sun 17, about 06:30 (Sat 16 at 15:00 as backup)", u:"https://www.google.com/search?q=Isla+Magdalena+penguin+tour+Punta+Arenas", l:"Search"},
+  {t:"Torres del Paine park ticket", s:"pasesparques.cl · by sector + time slot · ≥ 24 h ahead", u:"https://www.pasesparques.cl", l:"Open"},
+  {t:"Ice trekking (optional)", s:"Hielo & Aventura · Sun 10 · sells out in January", u:"https://hieloyaventura.com", l:"Open"},
+  {t:"Bus to Chile", s:"El Calafate → Puerto Natales · Thu 14, early departure", u:"https://www.google.com/search?q=bus+El+Calafate+Puerto+Natales", l:"Search"},
+  {t:"Buenos Aires apartment for 4", s:"Palermo · Thu 7 – Sat 9, 2 nights", u:"https://www.google.com/maps/search/?api=1&query=Palermo+Soho+Buenos+Aires", l:"Find"},
+  {t:"El Calafate stays", s:"Sat 9 – Mon 11 and Wed 13 – Thu 14 · Esplendor, Xelena or an apartment", u:"https://www.google.com/maps/search/?api=1&query=hotels+El+Calafate", l:"Find"}
+];
+const ST = ["To book","On hold","Booked"];
+let bstat = store.get("pt27-book", {});
+function renderBook(){
+  $("#booklist").innerHTML = BOOK.map((b,i) => { const s = bstat[i]||0; return `
+    <div class="brow ${s===2?"done":""}">
+      <span class="pri num">${i+1}</span>
+      <div><b>${esc(b.t)}</b><small>${esc(b.s)}</small></div>
+      <div class="acts">
+        <a class="btn" href="${b.u}" target="_blank" rel="noopener">${b.l} ↗</a>
+        <button type="button" class="status" data-i="${i}" data-s="${s}" aria-label="Status for ${esc(b.t)}: ${ST[s]}. Click to change.">${ST[s]}</button>
+      </div>
+    </div>`; }).join("");
+}
+$("#booklist").addEventListener("click", e => { const b = e.target.closest(".status"); if (!b) return; const i = +b.dataset.i; bstat[i] = ((bstat[i]||0)+1)%3; store.set("pt27-book", bstat); renderBook(); });
+renderBook();
+
+/* ---------------- CREDITS ---------------- */
+$("#credits").innerHTML = Object.keys(IMG).map(k => `<a href="${filePage(k)}" target="_blank" rel="noopener">${esc(IMG[k].replace(/\.(jpe?g)$/i,""))}</a>`).join("");
+
+/* ---------------- HERO bits ---------------- */
+(function ticks(){
+  let t = "";
+  for (let a=0; a<360; a+=10){ const r1 = a%90===0 ? 80 : (a%30===0 ? 77 : 81), rad = a*Math.PI/180;
+    t += `<line x1="${100+r1*Math.sin(rad)}" y1="${100-r1*Math.cos(rad)}" x2="${100+86*Math.sin(rad)}" y2="${100-86*Math.cos(rad)}" stroke-width="${a%30===0?1.5:.8}"/>`; }
+  $("#ticks").innerHTML = t;
+})();
+(function countdown(){
+  const dep = new Date(2027,0,7,18,0,0), now = new Date(), ms = dep - now;
+  const days = Math.ceil(ms / 86400000);
+  if (days > 0){ $("#cd-days").textContent = days; $("#cd-label").textContent = (days===1 ? "day" : "days") + " until wheels-up · Thu 7 Jan"; }
+  else if (now < new Date(2027,0,18)){ $("#cd-days").textContent = "Day " + Math.min(11, 1 - days + 1); $("#cd-label").textContent = "of 11 · we're on the road"; }
+  else { $("#cd-days").textContent = "✓"; $("#cd-label").textContent = "Expedition complete"; }
+})();
+(function stars(){
+  const c = $("#stars"), ctx = c.getContext("2d");
+  function draw(){
+    const r = c.parentElement.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio||1);
+    c.width = r.width*dpr; c.height = r.height*dpr; c.style.width = r.width+"px"; c.style.height = r.height+"px";
+    ctx.scale(dpr,dpr); ctx.clearRect(0,0,r.width,r.height);
+    let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+    for (let i=0;i<180;i++){ const x = rnd()*r.width, y = rnd()*r.height*.7, s = rnd()*1.3+.2;
+      ctx.fillStyle = `rgba(230,240,245,${.25+rnd()*.6})`; ctx.beginPath(); ctx.arc(x,y,s,0,7); ctx.fill(); }
+    // Southern Cross
+    const sc = [[.82,.16],[.85,.30],[.79,.23],[.88,.22],[.835,.255]];
+    sc.forEach(([fx,fy],i) => { ctx.fillStyle = "rgba(240,248,252,.95)"; ctx.beginPath(); ctx.arc(fx*r.width, fy*r.height, i===4?1.2:2.2, 0, 7); ctx.fill(); });
+  }
+  draw(); let to; addEventListener("resize", () => { clearTimeout(to); to = setTimeout(draw, 200); });
+})();
+
+/* ---------------- THEME ---------------- */
+$("#themeBtn").addEventListener("click", () => {
+  const next = isDark() ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  store.set("pt27-theme", next); refreshTheme();
+});
+const saved = store.get("pt27-theme", null);
+if (saved) document.documentElement.setAttribute("data-theme", saved);
+function refreshTheme(){
+  if (!map) return;
+  tiles.remove(); tiles = tileLayer().addTo(map); tiles.bringToBack(); drawLines();
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", refreshTheme);
+
+/* ---------------- BOOT ---------------- */
+initMap();
+renderBudget();
+showDay(cur, false);
+})();
+</script>
+</body>
+</html>
