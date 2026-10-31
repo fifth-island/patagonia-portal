@@ -1,6 +1,6 @@
 # Patagonia Expedition '27
 
-Trip portal for four friends: Buenos Aires, El Calafate, El Chaltén, Torres del Paine and the penguins of Isla Magdalena, 7–17 January 2027.
+Trip portal for four friends: Buenos Aires, El Calafate, El Chaltén, Torres del Paine and the penguins of Isla Magdalena, 14–24 January 2027.
 
 **Live site:** https://patagonia-portal-gamma.vercel.app
 
