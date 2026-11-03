@@ -619,9 +619,9 @@ const imgTag = (k, alt, w) => `<img src="${photo(k,w)}" alt="${esc(alt)}" loadin
 const STOPS = [
   {id:"fte",  n:1,  name:"El Calafate",         r:"ar", ll:[-50.3379,-72.2648], days:[0,1,4], img:"calafate", note:"Where we land from Brazil (airport FTE). Gateway town on Lago Argentino. Pick up and return the Argentine rental car here."},
   {id:"pm",   n:2,  name:"Perito Moreno Glacier",r:"ar",ll:[-50.4706,-73.0345], days:[1],     img:"moreno",   note:"About 80 km from town. Boardwalks face a 5 km-wide ice front."},
-  {id:"cha",  n:3,  name:"El Chaltén",          r:"ar", ll:[-49.3315,-72.8863], days:[2,3,4], img:"chalten",  note:"Argentina's trekking capital. Trails start right from the village."},
+  {id:"cha",  n:3,  name:"El Chaltén",          r:"ar", ll:[-49.3315,-72.8863], days:[1,2,3,4], img:"chalten",  note:"Argentina's trekking capital. Trails start right from the village."},
   {id:"lt",   n:4,  name:"Laguna de los Tres",  r:"ar", ll:[-49.2716,-73.0019], days:[3],     img:"fitz",     note:"Glacial lake at the foot of Fitz Roy (3,405 m)."},
-  {id:"ltor", n:5,  name:"Laguna Torre",        r:"ar", ll:[-49.3289,-73.0822], days:[4],     img:"torre",    note:"Flatter hike to the lake below Cerro Torre (3,128 m)."},
+  {id:"ltor", n:5,  name:"Laguna Torre",        r:"ar", ll:[-49.3289,-73.0822], days:[2],     img:"torre",    note:"Flatter hike to the lake below Cerro Torre (3,128 m)."},
   {id:"pnt",  n:6,  name:"Puerto Natales",      r:"cl", ll:[-51.7236,-72.4875], days:[5],     img:"natales",  note:"Chilean fjord town. Pick up the rental SUV here."},
   {id:"peh",  n:7,  name:"Lago Pehoé",          r:"cl", ll:[-51.0857,-73.0517], days:[5,6,7], img:"pehoe",    note:"Our two nights inside Torres del Paine, facing the Cuernos."},
   {id:"sal",  n:8,  name:"Salto Grande",        r:"cl", ll:[-51.0200,-73.0067], days:[6],     img:"salto",    note:"Turquoise waterfall. Easy walk to Mirador Cuernos."},
@@ -636,18 +636,18 @@ const DAYS = [
   {d:9,  ic:"plane", dow:"Sat", r:"ar", tag:"Fly in",   title:"Fly to Patagonia",          img:"calafate",
    plan:["Morning flight from Brazil, connecting in Buenos Aires. Book it all on one ticket, and avoid changing between airports (EZE → AEP) if you can","Land in El Calafate in the afternoon or evening and pick up the rental car at the airport","First Patagonian lamb dinner in town"],
    move:"Flight Brazil → Buenos Aires → FTE", sleep:"El Calafate", wx:"19° / 7°", sun:"Sunset ~22:00", stops:["fte"]},
-  {d:10, ic:"ice", dow:"Sun", r:"ar", tag:"Glacier",  title:"Perito Moreno Glacier",     img:"moreno",
-   plan:["Drive to the glacier in the rental car, about 1 h 15 each way. Leave early to arrive before the tour buses","Walk the boardwalks and wait for ice to break off the front","Optional: ice trekking on the glacier, or the boat in front of the ice wall"],
-   move:"Rental car · 80 km each way", sleep:"El Calafate", wx:"19° / 7°", sun:"Sunset ~22:00", stops:["fte","pm"]},
-  {d:11, ic:"bus", dow:"Mon", r:"ar", tag:"Chaltén",  title:"North to El Chaltén",       img:"chalten",
-   plan:["Drive Ruta 40 north (215 km), with a coffee stop at the historic La Leona roadhouse","Watch for Fitz Roy on the approach, then a short evening hike to Mirador de los Cóndores (1–2 h)","Check in to Hostería El Pilar, 17 km past the village. The car makes this easy"],
-   move:"Rental car Calafate → Chaltén (~2 h 45)", sleep:"El Chaltén · Hostería El Pilar", wx:"17° / 6°", sun:"Sunset ~22:00", stops:["fte","cha"]},
+  {d:10, ic:"ice", dow:"Sun", r:"ar", tag:"Glacier",  title:"Glacier, then north",       img:"moreno",
+   plan:["Leave around 07:00 and reach Perito Moreno before the tour buses (~1 h 15). About 4 h on the boardwalks is plenty","Optional: ice trekking or the boat in front of the ice wall instead","After lunch, drive Ruta 40 north to El Chaltén (~2 h 45 from Calafate), with a coffee stop at La Leona"],
+   move:"Rental car · glacier, then Calafate → Chaltén", sleep:"El Chaltén · Hostería El Pilar", wx:"19° / 7°", sun:"Sunset ~22:00", stops:["fte","pm","cha"]},
+  {d:11, ic:"boot", dow:"Mon", r:"ar", tag:"Torre",    title:"Laguna Torre",              img:"torre",
+   plan:["Laguna Torre (≈ 18 km, mostly flat), below Cerro Torre","If Monday's forecast is the clearest of the three days, do Fitz Roy today and swap","Evening: Mirador de los Cóndores for sunset over the village"],
+   move:"On foot · ≈ 18 km", sleep:"El Chaltén · Hostería El Pilar", wx:"17° / 6°", sun:"Sunset ~22:00", stops:["cha","ltor"]},
   {d:12, ic:"boot", dow:"Tue", r:"ar", tag:"Fitz Roy", title:"Laguna de los Tres",        img:"fitz",
    plan:["Start early from the El Pilar trailhead. The best light on Fitz Roy is in the morning","Steady trail through lenga forest, then a steep last kilometer","Lunch at the lake, then celebrate with craft beer in the village"],
    move:"On foot · ≈ 22 km", sleep:"El Chaltén · Hostería El Pilar", wx:"17° / 6°", sun:"Sunset ~22:00", stops:["cha","lt"]},
-  {d:13, ic:"boot", dow:"Wed", r:"ar", tag:"Spare",    title:"Laguna Torre or weather day",img:"torre",
-   plan:["If yesterday was cloudy, try Fitz Roy again today","Otherwise: Laguna Torre (≈ 18 km, mostly flat) to see Cerro Torre","Drive back to El Calafate whenever suits you, refuel and return the car"],
-   move:"Rental car Chaltén → Calafate · return it", sleep:"El Calafate", wx:"17° / 6°", sun:"Sunset ~22:00", stops:["cha","ltor","fte"]},
+  {d:13, ic:"car", dow:"Wed", r:"ar", tag:"Spare",    title:"Weather day, drive back",   img:"chalten",
+   plan:["Spare day: retry Fitz Roy if it was in cloud, or take it easy","Easy options: Chorrillo del Salto waterfall, or the road to Lago del Desierto","Late afternoon: drive back to El Calafate, refuel and return the car"],
+   move:"Rental car Chaltén → Calafate · return it", sleep:"El Calafate", wx:"17° / 6°", sun:"Sunset ~22:00", stops:["cha","fte"]},
   {d:14, ic:"car", dow:"Thu", r:"cl", tag:"→ Chile",  title:"Across the border",         img:"natales",
    plan:["Early bus to Puerto Natales, 5–6 h including the border. The Argentine car stays in Argentina","Pick up the SUV and drive into Torres del Paine (~2 h)","Sunset over the Cuernos from Lago Pehoé"],
    move:"Bus Calafate → Natales · SUV to park", sleep:"Torres del Paine · Hostería Pehoé", wx:"16° / 6°", sun:"Sunset ~22:00", stops:["fte","pnt","peh"]},
@@ -872,12 +872,12 @@ const PLACES = [
   {k:"fitz",   t:"Fitz Roy",      s:"3,405 m of granite above Laguna de los Tres. The Tehuelche called it Chaltén, \"smoking mountain\".", m:"El Chaltén · Tue 12", c:"w6"},
   {k:"cuernos",t:"Cuernos del Paine",s:"Granite \"horns\" with dark sedimentary caps, mirrored in Lago Pehoé.", m:"Torres del Paine · Thu 14 – Sat 16", c:"w6"},
   {k:"torres", t:"Las Torres",    s:"Three granite towers above a glacial lake. Best seen at sunrise.", m:"Torres del Paine · Fri 15"},
-  {k:"torre",  t:"Cerro Torre",   s:"A 3,128 m spire, often in its own cloud, above Laguna Torre.", m:"El Chaltén · Wed 13"},
+  {k:"torre",  t:"Cerro Torre",   s:"A 3,128 m spire, often in its own cloud, above Laguna Torre.", m:"El Chaltén · Mon 11"},
   {k:"salto",  t:"Salto Grande",  s:"Turquoise water from Lago Nordenskjöld pours toward Pehoé. Expect strong wind on the trail.", m:"Torres del Paine · Fri 15"},
   {k:"guanaco",t:"Guanacos",      s:"Wild relatives of the llama, all over the park roads. Rheas and condors live here too.", m:"Torres del Paine", c:"w6"},
   {k:"icetrek",t:"Ice trekking", s:"Crampons on, walking across the glacier itself. Optional, and it sells out in January.", m:"Perito Moreno · Sun 10", c:"w6"},
   {k:"calafate",t:"Lago Argentino",s:"Argentina's largest lake, milky-blue from glacier silt.", m:"El Calafate · Sat 9 – Wed 13"},
-  {k:"chalten",t:"El Chaltén",    s:"A tiny village founded in 1985, with trailheads at the end of its streets.", m:"Mon 11 – Wed 13"},
+  {k:"chalten",t:"El Chaltén",    s:"A tiny village founded in 1985, with trailheads at the end of its streets.", m:"Sun 10 – Wed 13"},
   {k:"natales",t:"Puerto Natales",s:"A fjord town on Última Esperanza Sound, the last stop before the park.", m:"Thu 14"}
 ];
 $("#placegrid").innerHTML = PLACES.map(p => `<figure class="place ${p.c||""}" style="margin:0">${imgTag(p.k, p.t, /w8|w6/.test(p.c||"") ? 1280 : 960)}<figcaption class="ov"><span class="mono">${esc(p.m)}</span><b>${esc(p.t)}</b><span>${esc(p.s)}</span></figcaption></figure>`).join("");
@@ -1007,25 +1007,25 @@ const KNOW = [
   {t:"Penguins: Magdalena only", a:true, p:"The Seno Otway colony near Punta Arenas is closed to visitors. Isla Magdalena boats run November to March, with peak season departures around 06:30, 10:00 and 15:00. Wind can cancel trips, so treat Sat 15:00 as the backup."},
   {t:"The wind is serious", p:"Gusts over 100 km/h are normal. Hold car doors with both hands when you open them. A rental company may charge for a door bent by the wind. Hats go in the pocket at Salto Grande."},
   {t:"Same clock everywhere", p:"Argentine Patagonia and Chile's Magallanes region both use UTC−3, the same as Brasília. No jet lag. You'll have about 17 hours of daylight, with sunset around 22:00."},
-  {t:"Plan B is built in", p:"Wed 13 is a spare day in El Chaltén. If Fitz Roy is in cloud on Tuesday, swap the hikes. Mountain forecasts: check windy.com or mountain-forecast.com each evening."},
+  {t:"Three days for Fitz Roy", p:"We have three full days in El Chaltén (Mon–Wed). Fitz Roy is often in cloud, so do Laguna de los Tres on the clearest day and move the other plans around it. Mountain forecasts: check windy.com or mountain-forecast.com each evening."},
   {t:"Home via Santiago, one ticket", p:"Book Punta Arenas → Santiago → Brazil as a single ticket (e.g. LATAM). In Santiago you only change planes inside the airport, without going into the city. If wind delays the first flight, the airline has to rebook you. Avoid buying the two flights separately."},
   {t:"Money in Argentina", p:"Foreign credit cards now get a rate close to the market rate, so you don't need to carry lots of cash. Some small places in El Chaltén only take cash in pesos or US$."},
-  {t:"Two cars, one border", p:"Rent one car in El Calafate (Sun 10 – Wed 13) and a second in Puerto Natales. An Argentine rental needs a special permit to enter Chile and usually can't be dropped off there, so the Calafate → Natales leg is by bus. The roads to the glacier and El Chaltén are paved. Torres del Paine roads are gravel, so keep under 60 km/h, watch for guanacos and fill up in Natales. There's no fuel inside the park."}
+  {t:"Two cars, one border", p:"Rent one car in El Calafate (Sat 9 – Wed 13) and a second in Puerto Natales. An Argentine rental needs a special permit to enter Chile and usually can't be dropped off there, so the Calafate → Natales leg is by bus. The roads to the glacier and El Chaltén are paved. Torres del Paine roads are gravel, so keep under 60 km/h, watch for guanacos and fill up in Natales. There's no fuel inside the park."}
 ];
 $("#knowgrid").innerHTML = KNOW.map(k => `<div class="card ${k.a?"alert":""}"><h3>${esc(k.t)}</h3><p>${esc(k.p)}</p></div>`).join("");
 
 /* ---------------- BOOKINGS ---------------- */
 const BOOK = [
   {t:"Torres del Paine stay", s:"Hostería Pehoé (island, Cuernos view) or Hotel Río Serrano · Thu 14 – Sat 16, 2 nights", u:"https://www.google.com/maps/search/?api=1&query=Hosteria+Pehoe+Torres+del+Paine", l:"Find"},
-  {t:"Hostería El Pilar", s:"El Chaltén · Mon 11 – Wed 13, 2 nights", u:"https://www.google.com/maps/search/?api=1&query=Hosteria+El+Pilar+El+Chalten", l:"Find"},
+  {t:"Hostería El Pilar", s:"El Chaltén · Sun 10 – Wed 13, 3 nights", u:"https://www.google.com/maps/search/?api=1&query=Hosteria+El+Pilar+El+Chalten", l:"Find"},
   {t:"Flights", s:"Brazil → El Calafate via Buenos Aires on one ticket (Sat 9) · Punta Arenas → Brazil via Santiago on one ticket (Sun 17)", u:"https://www.google.com/travel/flights", l:"Search"},
-  {t:"Rental car in El Calafate", s:"Sun 10 – Wed 13 · pick up and return in El Calafate (town or airport FTE) · room for 4 + luggage", u:"https://www.google.com/search?q=rent+a+car+El+Calafate", l:"Search"},
+  {t:"Rental car in El Calafate", s:"Sat 9 – Wed 13 · pick up at the airport, return in El Calafate (town or airport FTE) · room for 4 + luggage", u:"https://www.google.com/search?q=rent+a+car+El+Calafate", l:"Search"},
   {t:"Rental SUV in Chile, one-way", s:"Pick up Puerto Natales Thu 14 → drop off Punta Arenas Sat 16", u:"https://www.google.com/search?q=rent+a+car+Puerto+Natales+one+way+Punta+Arenas", l:"Search"},
   {t:"Isla Magdalena boat", s:"Sun 17, about 06:30 (Sat 16 at 15:00 as backup)", u:"https://www.google.com/search?q=Isla+Magdalena+penguin+tour+Punta+Arenas", l:"Search"},
   {t:"Torres del Paine park ticket", s:"pasesparques.cl · by sector + time slot · ≥ 24 h ahead", u:"https://www.pasesparques.cl", l:"Open"},
   {t:"Ice trekking (optional)", s:"Hielo & Aventura · Sun 10 · sells out in January", u:"https://hieloyaventura.com", l:"Open"},
   {t:"Bus to Chile", s:"El Calafate → Puerto Natales · Thu 14, early departure", u:"https://www.google.com/search?q=bus+El+Calafate+Puerto+Natales", l:"Search"},
-  {t:"El Calafate stays", s:"Sat 9 – Mon 11 and Wed 13 – Thu 14 (3 nights) · Esplendor, Xelena or an apartment", u:"https://www.google.com/maps/search/?api=1&query=hotels+El+Calafate", l:"Find"}
+  {t:"El Calafate stays", s:"Sat 9 – Sun 10 and Wed 13 – Thu 14 (2 nights) · Esplendor, Xelena or an apartment", u:"https://www.google.com/maps/search/?api=1&query=hotels+El+Calafate", l:"Find"}
 ];
 const ST = ["To book","On hold","Booked"];
 let bstat = store.get("pt27-book", {});
